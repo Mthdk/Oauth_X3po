@@ -1,0 +1,44 @@
+from flask import Flask, redirect, url_for
+from flask_dance.contrib.twitter import make_twitter_blueprint, twitter 
+from flask_dance.contrib.github import make_github_blueprint, github
+import os
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+
+app = Flask(__name__)
+app.config['SECRET_KEY'] = 'senha'
+
+##twitter_blueprint = make_twitter_blueprint(api_key='GNmLSCi2uOHESN09JujLEEbXO', api_secret='YzQALfeNSD4d7TtHXS4Q9Q3Z7XHKepv9tcc02pN48rs6WNHVbe')
+github_blueprint = make_github_blueprint(client_id='4fd7115e2155105548aa', client_secret='f7d30687364877e73e8e0868c16ba3ff088aeaad')
+
+##app.register_blueprint(twitter_blueprint, url_prefix='/twitter_login')
+app.register_blueprint(github_blueprint, url_prefix='/github_login')
+
+'''@app.route('/twitter')
+def twitter_login():
+    if not twitter.authorized:
+        return redirect(url_for('twitter.login'))
+        
+    account_info = twitter.get('account/settings.json')
+
+    if account_info.ok:
+        account_info_json = account_info.json()
+        return '<h1> Seu nome no twitter é @{}'.format(account_info_json['screen_name'])
+    else:
+        return '<h1> Solicitação falhou! </h1>'''
+
+
+@app.route('/github')
+def github_login():
+    if not github.authorized:
+        return redirect(url_for('github.login'))
+
+    account_info = github.get('/user')
+
+    if account_info.ok:
+        account_info_json = account_info.json()
+        return '<h1> Seu nome no Github é {}'.format(account_info_json['login'])
+    else:
+        return '<h1> Solicitação falhou! </h1>'
+
+if __name__ == '__main__':
+    app.run(debug=True)
